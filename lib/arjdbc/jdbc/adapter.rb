@@ -448,6 +448,9 @@ module ActiveRecord
         if sql.respond_to?(:to_sql)
           sql = to_sql(sql, binds); to_sql = true
         end
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        end
         if prepared_statements?
           log(sql, name, binds) { @connection.execute_query(sql, binds) }
         else
@@ -464,6 +467,9 @@ module ActiveRecord
       def exec_insert(sql, name, binds, pk = nil, sequence_name = nil)
         if sql.respond_to?(:to_sql)
           sql = to_sql(sql, binds); to_sql = true
+        end
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
         end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_insert(sql, binds) }
@@ -482,6 +488,9 @@ module ActiveRecord
         if sql.respond_to?(:to_sql)
           sql = to_sql(sql, binds); to_sql = true
         end
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_delete(sql, binds) }
         else
@@ -498,6 +507,9 @@ module ActiveRecord
       def exec_update(sql, name, binds)
         if sql.respond_to?(:to_sql)
           sql = to_sql(sql, binds); to_sql = true
+        end
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
         end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_update(sql, binds) }
@@ -520,6 +532,9 @@ module ActiveRecord
       def exec_query_raw(sql, name = 'SQL', binds = [], &block)
         if sql.respond_to?(:to_sql)
           sql = to_sql(sql, binds); to_sql = true
+        end
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
         end
         if prepared_statements?
           log(sql, name, binds) { @connection.execute_query_raw(sql, binds, &block) }
@@ -592,6 +607,9 @@ module ActiveRecord
       # @deprecated it was only introduced due tests
       # @private
       def _execute(sql, name = nil)
+        if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
+          sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        end
         @connection.execute(sql)
       end
       private :_execute
