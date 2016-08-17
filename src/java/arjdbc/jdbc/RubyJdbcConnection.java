@@ -870,11 +870,11 @@ public class RubyJdbcConnection extends RubyObject {
                         statement = prepStatement = connection.prepareStatement(query);
                         statement.setMaxRows(maxRows); // zero means there is no limit
                         setStatementParameters(context, connection, prepStatement, binds);
-                        statement.execute(query);
+                        prepStatement.execute();
                         if ( query.startsWith("SET search_path TO") ) {
-                          statement.getMoreResults();
+                          prepStatement.getMoreResults();
                         }
-                        resultSet = statement.getResultSet();
+                        resultSet = prepStatement.getResultSet();
                     }
 
                     if ( block != null && block.isGiven() ) {
