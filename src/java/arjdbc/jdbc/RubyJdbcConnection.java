@@ -588,9 +588,14 @@ public class RubyJdbcConnection extends RubyObject {
             public IRubyObject call(final Connection connection) throws SQLException {
                 Statement statement = null;
                 final String query = sql.convertToString().getUnicodeValue();
+                boolean isResultSet;
                 try {
                     statement = createStatement(context, connection);
-                    if ( doExecute(statement, query) ) {
+                    isResultSet = doExecute(statement, query);
+                    if ( query.startsWith("SET search_path TO") ) {
+                      isResultSet = statement.getMoreResults();
+                    }
+                    if (isResultSet) {
                         return mapResults(context, connection, statement, false);
                     } else {
                         return mapGeneratedKeysOrUpdateCount(context, connection, statement);
@@ -712,12 +717,20 @@ public class RubyJdbcConnection extends RubyObject {
                 try {
                     statement = createStatement(context, connection);
                     if ( returnGeneratedKeys ) {
-                        statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+                        statement.execute(query, Statement.RETURN_GENERATED_KEYS);
+                        if ( query.startsWith("SET search_path TO") ) {
+                          statement.getMoreResults();
+                        }
                         IRubyObject keys = mapGeneratedKeys(context.getRuntime(), connection, statement);
                         return keys == null ? context.getRuntime().getNil() : keys;
                     }
                     else {
-                        final int rowCount = statement.executeUpdate(query);
+                        final int rowCount;
+                        statement.execute(query);
+                        if ( query.startsWith("SET search_path TO") ) {
+                          statement.getMoreResults();
+                        }
+                        rowCount = statement.getUpdateCount();
                         return context.getRuntime().newFixnum(rowCount);
                     }
                 }
@@ -846,14 +859,22 @@ public class RubyJdbcConnection extends RubyObject {
                     if ( binds == null ) { // plain statement
                         statement = createStatement(context, connection);
                         statement.setMaxRows(maxRows); // zero means there is no limit
-                        resultSet = statement.executeQuery(query);
+                        statement.execute(query);
+                        if ( query.startsWith("SET search_path TO") ) {
+                          statement.getMoreResults();
+                        }
+                        resultSet = statement.getResultSet();
                     }
                     else {
                         final PreparedStatement prepStatement;
                         statement = prepStatement = connection.prepareStatement(query);
                         statement.setMaxRows(maxRows); // zero means there is no limit
                         setStatementParameters(context, connection, prepStatement, binds);
-                        resultSet = prepStatement.executeQuery();
+                        statement.execute(query);
+                        if ( query.startsWith("SET search_path TO") ) {
+                          statement.getMoreResults();
+                        }
+                        resultSet = statement.getResultSet();
                     }
 
                     if ( block != null && block.isGiven() ) {
@@ -950,7 +971,11 @@ public class RubyJdbcConnection extends RubyObject {
                 try {
                     statement = createStatement(context, connection);
                     statement.setMaxRows(maxRows); // zero means there is no limit
-                    resultSet = statement.executeQuery(query);
+                    statement.execute(query);
+                    if ( query.startsWith("SET search_path TO") ) {
+                      statement.getMoreResults();
+                    }
+                    resultSet = statement.getResultSet();
                     return mapQueryResult(context, connection, resultSet);
                 }
                 catch (final SQLException e) {
