@@ -450,6 +450,8 @@ module ActiveRecord
         end
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         if prepared_statements?
           log(sql, name, binds) { @connection.execute_query(sql, binds) }
@@ -470,6 +472,8 @@ module ActiveRecord
         end
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_insert(sql, binds) }
@@ -490,6 +494,8 @@ module ActiveRecord
         end
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_delete(sql, binds) }
@@ -510,6 +516,8 @@ module ActiveRecord
         end
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         if prepared_statements?
           log(sql, name || 'SQL', binds) { @connection.execute_update(sql, binds) }
@@ -535,6 +543,8 @@ module ActiveRecord
         end
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         if prepared_statements?
           log(sql, name, binds) { @connection.execute_query_raw(sql, binds, &block) }
@@ -609,6 +619,8 @@ module ActiveRecord
       def _execute(sql, name = nil)
         if defined?(::Despacho) && ::Despacho.switch_connections? && ::Despacho.current_shard?
           sql = "SET search_path TO #{::Despacho.schema};#{sql}"
+        else
+          puts "skipping #{__FILE__}:#{__LINE__} #{defined?(::Despacho)}, #{::Despacho.switch_connections?}, #{::Despacho.current_shard?}, #{::Despacho.current_shard}"
         end
         @connection.execute(sql)
       end
