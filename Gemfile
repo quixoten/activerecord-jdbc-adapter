@@ -14,6 +14,10 @@ else
   gem 'activerecord', :require => nil
 end
 
+# NOTE: gem overrides AR internals and assumes it can safely patch adapter classes ...
+# thus it is to be used (in tests) as an optional - tests should roll fine without it!
+gem 'composite_primary_keys', :require => nil unless ENV['COMPOSITE_PK'].eql?('false')
+
 gem 'thread_safe', :require => nil # "optional" - we can roll without it
 
 if defined?(JRUBY_VERSION) && JRUBY_VERSION < '1.7.0'
@@ -34,7 +38,7 @@ gem 'bcrypt-ruby', '~> 3.0.0', :require => nil, :group => :test
 #gem 'trinidad_dbpool', :require => nil, :group => :test
 
 group :development do
-  gem 'ruby-debug', :require => nil # if ENV['DEBUG']
+  gem 'ruby-debug', :require => nil if ENV['DEBUG']
   group :doc do
     gem 'yard', :require => nil
     gem 'yard-method-overrides', :github => 'kares/yard-method-overrides', :require => nil
